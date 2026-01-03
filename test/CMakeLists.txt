@@ -22,6 +22,10 @@ add_executable(test_segment_tree test_segment_tree.cpp)
 target_link_libraries(test_segment_tree cp)
 add_test(NAME test_segment_tree COMMAND test_segment_tree)
 
+add_executable(test_segtree2 test_segtree2.cpp)
+target_link_libraries(test_segtree2 cp)
+add_test(NAME test_segtree2 COMMAND test_segtree2)
+
 add_executable(test_unionfind test_unionfind.cpp)
 target_link_libraries(test_unionfind cp)
 add_test(NAME test_unionfind COMMAND test_unionfind)

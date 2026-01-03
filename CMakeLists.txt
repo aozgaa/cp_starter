@@ -17,7 +17,7 @@ target_sources(cp
   src/heaps_alg.hpp
   src/pbds.hpp
   src/scanf_demo.hpp
-  src/segment_tree.hpp
+  src/rmq_segtree.hpp
   src/unionfind.hpp
 )
 

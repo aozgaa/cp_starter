@@ -1,4 +1,4 @@
-#include "segtree2.hpp"
+#include "point_segtree.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -79,7 +79,7 @@ size_t naive_min_left(ST& st, size_t r, F f) {
 
 void test_sum_basic() {
   std::vector<int> v = {1, 2, 3, 4, 5};
-  SegTree<SumTraits> st(v);
+  PointSegTree<SumTraits> st(v);
 
   assert_eq(st.pquery(0), 1, "sum pquery first");
   assert_eq(st.pquery(4), 5, "sum pquery last");
@@ -107,7 +107,7 @@ void test_sum_basic() {
 void test_sum_ones() {
   for(int n = 1; n <= 128; ++n) {
     std::vector<int> vs(n,1);
-    SegTree<SumTraits> st(vs);
+    PointSegTree<SumTraits> st(vs);
 
     for(int i = 0; i < n; ++i) {
       assert_eq(st.pquery(i), vs[i], "entries should be one");
@@ -137,7 +137,7 @@ void test_sum_rng() {
   for(int n = 1; n <= 64; ++n) {
     std::vector<int> vs(n);
     for(int i = 0; i < n; ++i) vs[i] = dist(rng);
-    SegTree<SumTraits> st(vs);
+    PointSegTree<SumTraits> st(vs);
 
     std::vector<int> pref(n + 1, 0);
     for(int i = 0; i < n; ++i) pref[i + 1] = pref[i] + vs[i];
@@ -166,7 +166,7 @@ void test_sum_rng() {
 }
 
 void test_sum_singleton() {
-  SegTree<SumTraits> st(std::vector<int>{7});
+  PointSegTree<SumTraits> st(std::vector<int>{7});
   assert_eq(st.pquery(0), 7, "sum singleton pquery");
   assert_eq(st.rquery(0, 1), 7, "sum singleton rquery");
   assert_eq(st.rquery(0, 0), 0, "sum singleton empty");
@@ -183,7 +183,7 @@ void test_sum_edge_cases() {
   std::vector<int> sizes = {1, 2, 3, 7, 8, 9, 15, 16, 17};
   for (int n : sizes) {
     std::vector<int> vs(n, 0);
-    SegTree<SumTraits> st(vs);
+    PointSegTree<SumTraits> st(vs);
 
     assert_eq(st.rquery(), 0, "sum all_prod zero");
     for (int i = 0; i <= n; ++i) {
@@ -208,7 +208,7 @@ void test_sum_edge_cases() {
 
 void test_max_basic() {
   std::vector<int> v = {1, -2, 3, 4, 5};
-  SegTree<MaxTraits> st(v);
+  PointSegTree<MaxTraits> st(v);
 
   assert_eq(st.pquery(0), 1, "max pquery first");
   assert_eq(st.pquery(4), 5, "max pquery last");
@@ -234,7 +234,7 @@ void test_max_basic() {
 
 void test_sum_max_right() {
   std::vector<int> v = {1, 2, 3, 4, 5};
-  SegTree<SumTraits> st(v);
+  PointSegTree<SumTraits> st(v);
   const size_t n = v.size();
 
   for (int limit : {1, 3, 6, 10, 15, 16}) {
@@ -264,7 +264,7 @@ void test_sum_max_right() {
 
 void test_max_max_right() {
   std::vector<int> v = {1, -2, 3, 4, 5};
-  SegTree<MaxTraits> st(v);
+  PointSegTree<MaxTraits> st(v);
   const size_t n = v.size();
 
   for (int limit : {-3, -2, 0, 3, 4, 5, 6}) {
@@ -293,7 +293,7 @@ void test_max_max_right() {
 
 void test_concat_order() {
   std::vector<std::string> v = {"a", "b", "c", "d", "e"};
-  SegTree<ConcatTraits> st(v);
+  PointSegTree<ConcatTraits> st(v);
 
   assert_eq_str(st.pquery(0), std::string("a"), "concat pquery first");
   assert_eq_str(st.pquery(4), std::string("e"), "concat pquery last");

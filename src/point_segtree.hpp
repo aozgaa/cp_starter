@@ -30,7 +30,7 @@ constexpr size_t log2(size_t n) {
 }
 
 template<MonoidTraitsConcept Traits>
-struct SegTree {
+struct PointSegTree {
   using T = typename Traits::T;
   using Op = typename Traits::Op;
   constexpr static T e() { return Traits::e(); }
@@ -38,8 +38,8 @@ struct SegTree {
   using Key = size_t;
   using VT = std::vector<T>;
 
-  SegTree(size_t n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e()) {} 
-  SegTree(VT vs) : SegTree{vs.size()} { for(int i = 0; i < n_; ++i) set(i,vs[i]); }
+  PointSegTree(size_t n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e()) {}
+  PointSegTree(VT vs) : PointSegTree{vs.size()} { for(int i = 0; i < n_; ++i) set(i,vs[i]); }
 
   // update tree
   void set(Key k, T x);
@@ -67,7 +67,7 @@ struct SegTree {
 };
 
 template<MonoidTraitsConcept Traits>
-void SegTree<Traits>::set(Key k, T x) {
+void PointSegTree<Traits>::set(Key k, T x) {
   k += sz_;
   tree_[k]= x;
   for(k >>= 1; k > 0; k >>= 1) {
@@ -76,12 +76,12 @@ void SegTree<Traits>::set(Key k, T x) {
 }
 
 template<MonoidTraitsConcept Traits>
-typename SegTree<Traits>::T SegTree<Traits>::pquery(Key k) {
+typename PointSegTree<Traits>::T PointSegTree<Traits>::pquery(Key k) {
   return tree_[k+sz_];
 }
 
 template<MonoidTraitsConcept Traits>
-typename SegTree<Traits>::T SegTree<Traits>::rquery(Key l, Key r) {
+typename PointSegTree<Traits>::T PointSegTree<Traits>::rquery(Key l, Key r) {
   T lv=e(), rv=e();
   l += sz_;
   r += sz_;
@@ -95,11 +95,11 @@ typename SegTree<Traits>::T SegTree<Traits>::rquery(Key l, Key r) {
 }
 
 template<MonoidTraitsConcept Traits>
-typename SegTree<Traits>::T SegTree<Traits>::rquery() { return tree_[1]; }
+typename PointSegTree<Traits>::T PointSegTree<Traits>::rquery() { return tree_[1]; }
 
 template<MonoidTraitsConcept Traits>
 template<class F>
-typename SegTree<Traits>::Key SegTree<Traits>::max_true_idx(Key l, F&& f) {
+typename PointSegTree<Traits>::Key PointSegTree<Traits>::max_true_idx(Key l, F&& f) {
   using Fn = std::remove_cvref_t<F>;
   static_assert(std::is_invocable_r_v<bool, Fn, T>);
   assert(l <= n_);
@@ -131,7 +131,7 @@ typename SegTree<Traits>::Key SegTree<Traits>::max_true_idx(Key l, F&& f) {
 
 template<MonoidTraitsConcept Traits>
 template<class F>
-typename SegTree<Traits>::Key SegTree<Traits>::min_true_idx(Key r, F&& f) {
+typename PointSegTree<Traits>::Key PointSegTree<Traits>::min_true_idx(Key r, F&& f) {
   using Fn = std::remove_cvref_t<F>;
   static_assert(std::is_invocable_r_v<bool, Fn, T>);
   assert(r <= n_);

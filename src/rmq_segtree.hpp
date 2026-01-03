@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <vector>
 
-class SegmentTree {
+class RMQSegTree {
 public:
-    explicit SegmentTree(int sz);
-    explicit SegmentTree(const std::vector<int> &initialA);
+    explicit RMQSegTree(int sz);
+    explicit RMQSegTree(const std::vector<int> &initialA);
 
     void update(int i, int j, int val);
     int RMQ(int i, int j);
@@ -27,15 +27,15 @@ private:
     void update(int p, int L, int R, int i, int j, int val);
 };
 
-inline int SegmentTree::l(int p) {
+inline int RMQSegTree::l(int p) {
     return p << 1;
 }
 
-inline int SegmentTree::r(int p) {
+inline int RMQSegTree::r(int p) {
     return (p << 1) + 1;
 }
 
-inline int SegmentTree::conquer(int a, int b) {
+inline int RMQSegTree::conquer(int a, int b) {
     if (a == -1) {
         return b;
     }
@@ -45,15 +45,15 @@ inline int SegmentTree::conquer(int a, int b) {
     return std::min(a, b);
 }
 
-inline SegmentTree::SegmentTree(int sz) : n(sz), st(4 * n), lazy(4 * n, -1) {}
+inline RMQSegTree::RMQSegTree(int sz) : n(sz), st(4 * n), lazy(4 * n, -1) {}
 
-inline SegmentTree::SegmentTree(const std::vector<int> &initialA)
-    : SegmentTree(static_cast<int>(initialA.size())) {
+inline RMQSegTree::RMQSegTree(const std::vector<int> &initialA)
+    : RMQSegTree(static_cast<int>(initialA.size())) {
     A = initialA;
     build(1, 0, n - 1);
 }
 
-inline void SegmentTree::build(int p, int L, int R) {
+inline void RMQSegTree::build(int p, int L, int R) {
     if (L == R) {
         st[p] = A[L];
     } else {
@@ -64,7 +64,7 @@ inline void SegmentTree::build(int p, int L, int R) {
     }
 }
 
-inline void SegmentTree::propagate(int p, int L, int R) {
+inline void RMQSegTree::propagate(int p, int L, int R) {
     if (lazy[p] != -1) {
         st[p] = lazy[p];
         if (L != R) {
@@ -76,7 +76,7 @@ inline void SegmentTree::propagate(int p, int L, int R) {
     }
 }
 
-inline int SegmentTree::RMQ(int p, int L, int R, int i, int j) {
+inline int RMQSegTree::RMQ(int p, int L, int R, int i, int j) {
     propagate(p, L, R);
     if (i > j) {
         return -1;
@@ -89,7 +89,7 @@ inline int SegmentTree::RMQ(int p, int L, int R, int i, int j) {
                    RMQ(r(p), m + 1, R, std::max(i, m + 1), j));
 }
 
-inline void SegmentTree::update(int p, int L, int R, int i, int j, int val) {
+inline void RMQSegTree::update(int p, int L, int R, int i, int j, int val) {
     propagate(p, L, R);
     if (i > j) {
         return;
@@ -107,10 +107,10 @@ inline void SegmentTree::update(int p, int L, int R, int i, int j, int val) {
     }
 }
 
-inline void SegmentTree::update(int i, int j, int val) {
+inline void RMQSegTree::update(int i, int j, int val) {
     update(1, 0, n - 1, i, j, val);
 }
 
-inline int SegmentTree::RMQ(int i, int j) {
+inline int RMQSegTree::RMQ(int i, int j) {
     return RMQ(1, 0, n - 1, i, j);
 }

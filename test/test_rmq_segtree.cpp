@@ -1,11 +1,11 @@
-#include "segment_tree.hpp"
+#include "rmq_segtree.hpp"
 
 #include <cstdio>
 #include <vector>
 
 int main() {
     std::vector<int> A = {18, 17, 13, 19, 15, 11, 20, 99};
-    SegmentTree st(A);
+    RMQSegTree st(A);
 
     std::printf("              idx    0, 1, 2, 3, 4, 5, 6, 7\n");
     std::printf("              A is {18,17,13,19,15,11,20,oo}\n");

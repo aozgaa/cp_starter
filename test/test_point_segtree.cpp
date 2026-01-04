@@ -5,6 +5,7 @@
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
+#include <functional>
 #include <limits>
 #include <random>
 #include <string>
@@ -12,32 +13,22 @@
 
 struct SumTraits {
   using T = int;
-  struct Op {
-    int v;
-    Op(int a, int b) : v(a + b) {}
-    operator int() const { return v; }
-  };
-  static int e() { return 0; }
+  using Op = std::plus<int>;
+  static constexpr int e = 0;
 };
 
 struct MaxTraits {
   using T = int;
   struct Op {
-    int v;
-    Op(int a, int b) : v(std::max(a, b)) {}
-    operator int() const { return v; }
+    int operator()(int a, int b) const { return std::max(a, b); }
   };
-  static int e() { return std::numeric_limits<int>::min(); }
+  static constexpr int e = std::numeric_limits<int>::min();
 };
 
 struct ConcatTraits {
   using T = std::string;
-  struct Op {
-    std::string v;
-    Op(const std::string& a, const std::string& b) : v(a + b) {}
-    operator std::string() const { return v; }
-  };
-  static std::string e() { return ""; }
+  using Op = std::plus<std::string>;
+  inline static const std::string e = "";
 };
 
 void assert_eq(int got, int want, const char* msg) {

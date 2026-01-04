@@ -1,21 +1,20 @@
 #pragma once
 
-#include<concepts>
-#include<cassert>
-#include<span>
+#include <cassert>
+#include <concepts>
 #include <type_traits>
 #include <utility>
-#include<vector>
-
-using VI = std::vector<int>;
-using SI = std::span<int>;
+#include <vector>
 
 template<typename Traits>
-concept MonoidTraitsConcept = requires() {
-  typename Traits::T;
-  typename Traits::Op;
-  { Traits::e() } -> std::same_as<typename Traits::T>;
-};
+concept MonoidTraitsConcept =
+  std::default_initializable<typename Traits::Op> &&
+  requires(typename Traits::Op op, typename Traits::T a, typename Traits::T b) {
+    typename Traits::T;
+    typename Traits::Op;
+    { Traits::e } -> std::convertible_to<typename Traits::T>;
+    { op(a, b) } -> std::same_as<typename Traits::T>;
+  };
 
 constexpr size_t next_pow2(size_t n) {
   auto i = 1ll;
@@ -33,7 +32,8 @@ template<MonoidTraitsConcept Traits>
 struct PointSegTree {
   using T = typename Traits::T;
   using Op = typename Traits::Op;
-  constexpr static T e() { return Traits::e(); }
+  static const T& e() { return Traits::e; }
+  static constexpr Op op_{};
 
   using Key = size_t;
   using VT = std::vector<T>;
@@ -71,7 +71,7 @@ void PointSegTree<Traits>::set(Key k, T x) {
   k += sz_;
   tree_[k]= x;
   for(k >>= 1; k > 0; k >>= 1) {
-    tree_[k] = Op(tree_[k*2],tree_[k*2+1]);
+    tree_[k] = op_(tree_[k*2],tree_[k*2+1]);
   }
 }
 
@@ -86,12 +86,12 @@ typename PointSegTree<Traits>::T PointSegTree<Traits>::rquery(Key l, Key r) {
   l += sz_;
   r += sz_;
   while(l < r) {
-    if(l&1) /*is right subchild*/ lv=Op(lv,tree_[l++]);  
-    if(r&1) /*is left subchild*/ rv=Op(tree_[--r],rv);
+    if(l&1) /*is right subchild*/ lv=op_(lv,tree_[l++]);  
+    if(r&1) /*is left subchild*/ rv=op_(tree_[--r],rv);
     l>>=1;
     r>>=1;
   }
-  return Op(lv,rv);
+  return op_(lv,rv);
 }
 
 template<MonoidTraitsConcept Traits>
@@ -111,14 +111,14 @@ typename PointSegTree<Traits>::Key PointSegTree<Traits>::max_true_idx(Key l, F&&
   T rq = e(); // working range query result
   for(;;) {
     while((cur & 1) == 0) cur >>= 1; // climb until we have a disjoint segment containing the current cursor
-    if (f(Op(rq, tree_[cur]))) { // pred still true over [l,r)
-      rq = Op(rq, tree_[cur]);
+    if (f(op_(rq, tree_[cur]))) { // pred still true over [l,r)
+      rq = op_(rq, tree_[cur]);
       cur++; // go rightward to a left node
     } else { // pred became false somewhere in range
       while(cur < sz_) {
         cur <<= 1; // descend left
-        if (f(Op(rq, tree_[cur]))) {
-          rq = Op(rq,tree_[cur]);
+        if (f(op_(rq, tree_[cur]))) {
+          rq = op_(rq,tree_[cur]);
           cur++; // go to adjacent right node
         }
       }
@@ -143,13 +143,13 @@ typename PointSegTree<Traits>::Key PointSegTree<Traits>::min_true_idx(Key r, F&&
   for(;;) {
     --cur; // move to the last in-range leaf
     while(cur > 1 && (cur & 1)) cur >>= 1; // climb until we have a disjoint segment containing the current cursor
-    if (f(Op(tree_[cur], rq))) { // pred still true over [l,r)
-      rq = Op(tree_[cur], rq);
+    if (f(op_(tree_[cur], rq))) { // pred still true over [l,r)
+      rq = op_(tree_[cur], rq);
     } else { // pred became false somewhere in range
       while(cur < sz_) {
         cur = (cur<<1) + 1; // descend right
-        if (f(Op(tree_[cur], rq))) {
-          rq = Op(tree_[cur], rq);
+        if (f(op_(tree_[cur], rq))) {
+          rq = op_(tree_[cur], rq);
           cur--; // go leftward to right node
         }
       }

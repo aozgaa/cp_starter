@@ -2,9 +2,12 @@
 
 #include <cassert>
 #include <concepts>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+using size_type = std::size_t;
 
 template<typename Traits>
 concept MonoidTraitsConcept =
@@ -16,15 +19,15 @@ concept MonoidTraitsConcept =
     { op(a, b) } -> std::same_as<typename Traits::T>;
   };
 
-constexpr size_t next_pow2(size_t n) {
-  auto i = 1ll;
+constexpr size_type next_pow2(size_type n) {
+  size_type i = 1;
   for(; i < n; i <<= 1);
   return i;  
 }
 
-constexpr size_t log2(size_t n) {
-  auto i = 0ll; 
-  for(; (1<<i) < n; i++);
+constexpr size_type log2(size_type n) {
+  size_type i = 0; 
+  for(; (size_type{1}<<i) < n; i++);
   return i;
 }
 
@@ -35,11 +38,12 @@ struct PointSegTree {
   static constexpr T e_ = Traits::e;
   static constexpr Op op_{};
 
-  using Key = size_t;
+  using size_type = ::size_type;
+  using Key = size_type;
   using VT = std::vector<T>;
 
-  PointSegTree(size_t n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e_) {}
-  PointSegTree(VT vs) : PointSegTree{vs.size()} { for(int i = 0; i < n_; ++i) set(i,vs[i]); }
+  PointSegTree(size_type n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e_) {}
+  PointSegTree(VT vs) : PointSegTree{vs.size()} { for(size_type i = 0; i < n_; ++i) set(i,vs[i]); }
 
   // update tree
   void set(Key k, T x);
@@ -59,9 +63,9 @@ struct PointSegTree {
     Key min_true_idx(Key r, F&& f);
 
   private:
-  const size_t n_;
-  const size_t sz_;
-  const size_t lsz_;
+  const size_type n_;
+  const size_type sz_;
+  const size_type lsz_;
   VT tree_;
 
 };

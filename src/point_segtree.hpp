@@ -32,13 +32,13 @@ template<MonoidTraitsConcept Traits>
 struct PointSegTree {
   using T = typename Traits::T;
   using Op = typename Traits::Op;
-  static const T& e() { return Traits::e; }
+  static constexpr T e_ = Traits::e;
   static constexpr Op op_{};
 
   using Key = size_t;
   using VT = std::vector<T>;
 
-  PointSegTree(size_t n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e()) {}
+  PointSegTree(size_t n) : n_{n}, sz_{next_pow2(n)}, lsz_{log2(sz_)}, tree_(sz_*2,e_) {}
   PointSegTree(VT vs) : PointSegTree{vs.size()} { for(int i = 0; i < n_; ++i) set(i,vs[i]); }
 
   // update tree
@@ -49,11 +49,11 @@ struct PointSegTree {
   T rquery(Key l, Key r);
   // returns: aggregation over entire tree
   T rquery();
-  // assume: predicate f is monotone for rquery(l, i) as i increases and f(e()) is true
+  // assume: predicate f is monotone for rquery(l, i) as i increases and f(e_) is true
   // returns: max index i such that f(rquery(l, i)) is true
   template<class F>
     Key max_true_idx(Key l, F&& f);
-  // assume: predicate f is monotone for rquery(i, r) as i decreases and f(e()) is true
+  // assume: predicate f is monotone for rquery(i, r) as i decreases and f(e_) is true
   // returns: min index i such that f(rquery(i, r)) is true
   template<class F>
     Key min_true_idx(Key r, F&& f);
@@ -82,7 +82,7 @@ typename PointSegTree<Traits>::T PointSegTree<Traits>::pquery(Key k) {
 
 template<MonoidTraitsConcept Traits>
 typename PointSegTree<Traits>::T PointSegTree<Traits>::rquery(Key l, Key r) {
-  T lv=e(), rv=e();
+  T lv=e_, rv=e_;
   l += sz_;
   r += sz_;
   while(l < r) {
@@ -103,12 +103,12 @@ typename PointSegTree<Traits>::Key PointSegTree<Traits>::max_true_idx(Key l, F&&
   using Fn = std::remove_cvref_t<F>;
   static_assert(std::is_invocable_r_v<bool, Fn, T>);
   assert(l <= n_);
-  assert(f(e()));
+  assert(f(e_));
 
   if (l == n_) return n_;
 
   auto cur = l + sz_; // working range query end
-  T rq = e(); // working range query result
+  T rq = e_; // working range query result
   for(;;) {
     while((cur & 1) == 0) cur >>= 1; // climb until we have a disjoint segment containing the current cursor
     if (f(op_(rq, tree_[cur]))) { // pred still true over [l,r)
@@ -135,11 +135,11 @@ typename PointSegTree<Traits>::Key PointSegTree<Traits>::min_true_idx(Key r, F&&
   using Fn = std::remove_cvref_t<F>;
   static_assert(std::is_invocable_r_v<bool, Fn, T>);
   assert(r <= n_);
-  assert(f(e()));
+  assert(f(e_));
 
   if(r == 0) return 0;
   auto cur = r + sz_; // working range query end
-  T rq = e(); // working range query result
+  T rq = e_; // working range query result
   for(;;) {
     --cur; // move to the last in-range leaf
     while(cur > 1 && (cur & 1)) cur >>= 1; // climb until we have a disjoint segment containing the current cursor

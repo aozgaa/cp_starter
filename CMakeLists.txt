@@ -15,6 +15,7 @@ target_sources(cp
   src/fenwick.hpp
   src/gen_perms.hpp
   src/heaps_alg.hpp
+  src/kosaraju.hpp
   src/pbds.hpp
   src/scanf_demo.hpp
   src/rmq_segtree.hpp

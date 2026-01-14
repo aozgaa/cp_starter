@@ -10,6 +10,10 @@ add_executable(test_heaps_alg test_heaps_alg.cpp)
 target_link_libraries(test_heaps_alg cp)
 add_test(NAME test_heaps_alg COMMAND test_heaps_alg)
 
+add_executable(test_kosaraju test_kosaraju.cpp)
+target_link_libraries(test_kosaraju cp)
+add_test(NAME test_kosaraju COMMAND test_kosaraju)
+
 add_executable(test_pbds test_pbds.cpp)
 target_link_libraries(test_pbds cp)
 add_test(NAME test_pbds COMMAND test_pbds)
